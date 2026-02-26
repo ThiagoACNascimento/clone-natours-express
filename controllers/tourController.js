@@ -1,14 +1,14 @@
-import fs from "fs";
+import fs from 'fs';
 
-const tours = JSON.parse(fs.readFileSync("./dev-data/data/tours-simple.json"));
+const tours = JSON.parse(fs.readFileSync('./dev-data/data/tours-simple.json'));
 
 function checkID(request, response, next) {
   const id = request.params.id * 1;
 
   if (id > tours.length || id < 0) {
     return response.status(404).json({
-      status: "fail",
-      message: "Invalid ID",
+      status: 'fail',
+      message: 'Invalid ID',
     });
   }
 
@@ -18,17 +18,16 @@ function checkID(request, response, next) {
 function checkBody(request, response, next) {
   if (!request.body.name || !request.body.price) {
     return response.status(400).json({
-      status: "fail",
-      message: "Invalid Body",
+      status: 'fail',
+      message: 'Invalid Body',
     });
   }
   next();
 }
 
 function getAllTours(request, response) {
-  console.log(request.requestTime);
   response.status(200).json({
-    status: "success",
+    status: 'success',
     results: tours.length,
     requested: request.requestTime,
     data: {
@@ -43,7 +42,7 @@ function getTourByID(request, response) {
   const tour = tours.find((el) => el.id === id);
 
   response.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       tour,
     },
@@ -52,16 +51,23 @@ function getTourByID(request, response) {
 
 function createTour(request, response) {
   const newId = tours[tours.length - 1].id + 1;
-  const newTour = Object.assign({ id: newId }, request.body);
+  const newTour = Object.assign({ id: newId }, ...request.body);
 
   tours.push(newTour);
 
   fs.writeFile(
-    "./dev-data/data/tours-simple.json",
+    './dev-data/data/tours-simple.json',
     JSON.stringify(tours),
     (err) => {
+      if (err) {
+        return response.status(400).json({
+          status: 'fail',
+          message: 'Write file error',
+        });
+      }
+
       response.status(201).json({
-        status: "success",
+        status: 'success',
         data: {
           tours: newTour,
         },
@@ -71,12 +77,10 @@ function createTour(request, response) {
 }
 
 function updateTour(request, response) {
-  const id = request.params.id * 1;
-  const tour = tours.find((el) => el.id === id);
   const { name, duration, difficulty } = request.body;
 
   response.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       name,
       duration,
@@ -87,7 +91,7 @@ function updateTour(request, response) {
 
 function deleteTour(request, response) {
   response.status(200).json({
-    status: "success",
+    status: 'success',
     data: null,
   });
 }

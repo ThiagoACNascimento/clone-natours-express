@@ -1,16 +1,16 @@
-import e from "express";
-import tourControllers from "../controllers/tourController.js";
+import e from 'express';
+import tourControllers from '../controllers/tourController.js';
 
 const tourRouter = e.Router();
 
-tourRouter.param("id", tourControllers.checkID);
+tourRouter.param('id', tourControllers.checkID);
 
 tourRouter
-  .route("/")
+  .route('/')
   .get(tourControllers.getAllTours)
   .post(tourControllers.checkBody, tourControllers.createTour);
 tourRouter
-  .route("/:id")
+  .route('/:id')
   .get(tourControllers.getTourByID)
   .patch(tourControllers.updateTour)
   .delete(tourControllers.deleteTour);
