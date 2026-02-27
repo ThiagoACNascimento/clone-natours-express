@@ -22,7 +22,13 @@ async function createTour(request, response) {
 }
 
 async function getAllTours(request, response) {
-  const foundTour = await Tour.find();
+  const queryObject = { ...request.query };
+  const excludedFields = ['page', 'sort', 'limit', 'fields'];
+
+  excludedFields.forEach((element) => delete queryObject[element]);
+
+  const query = Tour.find(queryObject);
+  const foundTour = await query;
 
   if (foundTour.length <= 0) {
     return response.status(404).json({
