@@ -7,8 +7,8 @@ const tourRouter = e.Router();
 
 tourRouter
   .route('/')
-  .get(tourControllers.getAllTours)
-  .post(tourControllers.checkBody, tourControllers.createTour);
+  .post(tourControllers.createTour)
+  .get(tourControllers.getAllTours);
 tourRouter
   .route('/:id')
   .get(tourControllers.getTourByID)
