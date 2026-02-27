@@ -13,6 +13,6 @@ tourRouter
   .route('/:id')
   .get(tourControllers.getTourByID)
   .patch(tourControllers.updateTour)
-  .delete(tourControllers.deleteTour);
+  .delete(tourControllers.deleteTourByID);
 
 export default tourRouter;

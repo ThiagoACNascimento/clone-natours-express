@@ -5,12 +5,12 @@ async function createTour(request, response) {
   // newTour.save();
 
   try {
-    const newTour = await Tour.create(request.body);
+    const createdTour = await Tour.create(request.body);
 
     response.status(201).json({
       status: 'success',
       data: {
-        tours: newTour,
+        tours: createdTour,
       },
     });
   } catch (error) {
@@ -21,51 +21,91 @@ async function createTour(request, response) {
   }
 }
 
-function getAllTours(request, response) {
+async function getAllTours(request, response) {
+  const foundTour = await Tour.find();
+
+  if (foundTour.length <= 0) {
+    return response.status(404).json({
+      status: 'fail',
+      message: 'Tours not found',
+    });
+  }
+
   response.status(200).json({
     status: 'success',
-    results: tours.length,
+    results: foundTour.length,
     requested: request.requestTime,
     data: {
-      tours,
+      foundTour,
     },
   });
 }
 
-function getTourByID(request, response) {
-  response.status(200).json({
-    status: 'success',
-    data: {
-      tour,
-    },
-  });
+async function getTourByID(request, response) {
+  try {
+    const { id } = request.params;
+    const foundTour = await Tour.findById(id);
+    // Tour.findOne({ _id: id }); -- Same thing
+
+    response.status(200).json({
+      status: 'success',
+      data: {
+        foundTour,
+      },
+    });
+  } catch (error) {
+    response.status(404).json({
+      status: 'fail',
+      message: 'Tour not found',
+    });
+  }
 }
 
-function updateTour(request, response) {
-  const { name, duration, difficulty } = request.body;
+async function updateTour(request, response) {
+  try {
+    const { id } = request.params;
 
-  response.status(200).json({
-    status: 'success',
-    data: {
-      name,
-      duration,
-      difficulty,
-    },
-  });
+    const updatedTour = await Tour.findByIdAndUpdate(id, request.body, {
+      new: true,
+      runValidators: true,
+    });
+    response.status(200).json({
+      status: 'success',
+      data: {
+        updatedTour,
+      },
+    });
+  } catch (error) {
+    response.status(404).json({
+      status: 'fail',
+      message: 'Tour not found',
+    });
+  }
 }
 
-function deleteTour(request, response) {
-  response.status(200).json({
-    status: 'success',
-    data: null,
-  });
+async function deleteTourByID(request, response) {
+  try {
+    const { id } = request.params;
+
+    await Tour.findByIdAndDelete(id);
+
+    response.status(204).json({
+      status: 'success',
+      data: null,
+    });
+  } catch (error) {
+    response.status(404).json({
+      status: 'fail',
+      message: 'Tour not found',
+    });
+  }
 }
 
 const tourControllers = {
   getAllTours,
   getTourByID,
   updateTour,
-  deleteTour,
+  deleteTourByID,
   createTour,
 };
 
