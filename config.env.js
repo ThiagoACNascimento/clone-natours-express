@@ -1,3 +1,6 @@
 import { configDotenv } from 'dotenv';
+import { expand } from 'dotenv-expand';
 
-configDotenv({ path: './.env.development' });
+const myEnv = configDotenv({ path: './.env.development' });
+
+expand(myEnv);

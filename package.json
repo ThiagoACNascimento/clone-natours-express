@@ -8,11 +8,18 @@
   "keywords": [],
   "license": "ISC",
   "scripts": {
-    "dev": "node --watch --no-warnings server.js"
+    "dev": "node --watch --no-warnings server.js",
+    "service:up": "docker compose -f docker-compose.yaml up -d",
+    "service:stop": "docker compose -f docker-compose.yaml stop",
+    "service:down": "docker compose -f docker-compose.yaml down",
+    "lint:prettier:check": "prettier --check .",
+    "lint:prettier:fix": "prettier --write ."
   },
   "dependencies": {
     "dotenv": "^17.3.1",
+    "dotenv-expand": "^12.0.3",
     "express": "^4.22.1",
+    "mongoose": "^5.13.23",
     "morgan": "^1.10.1"
   },
   "devDependencies": {
