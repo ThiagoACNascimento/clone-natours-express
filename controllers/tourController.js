@@ -1,19 +1,5 @@
 import fs from 'fs';
-
-const tours = JSON.parse(fs.readFileSync('./dev-data/data/tours-simple.json'));
-
-function checkID(request, response, next) {
-  const id = request.params.id * 1;
-
-  if (id > tours.length || id < 0) {
-    return response.status(404).json({
-      status: 'fail',
-      message: 'Invalid ID',
-    });
-  }
-
-  next();
-}
+import Tour from '../models/tourModel.js';
 
 function checkBody(request, response, next) {
   if (!request.body.name || !request.body.price) {
@@ -97,7 +83,6 @@ function deleteTour(request, response) {
 }
 
 const tourControllers = {
-  checkID,
   checkBody,
   getAllTours,
   getTourByID,

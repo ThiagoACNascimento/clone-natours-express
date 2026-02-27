@@ -3,7 +3,7 @@ import tourControllers from '../controllers/tourController.js';
 
 const tourRouter = e.Router();
 
-tourRouter.param('id', tourControllers.checkID);
+// tourRouter.param('id', tourControllers.checkID);
 
 tourRouter
   .route('/')
