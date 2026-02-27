@@ -83,18 +83,29 @@ async function updateTour(request, response) {
   }
 }
 
-function deleteTour(request, response) {
-  response.status(200).json({
-    status: 'success',
-    data: null,
-  });
+async function deleteTourByID(request, response) {
+  try {
+    const { id } = request.params;
+
+    await Tour.findByIdAndDelete(id);
+
+    response.status(204).json({
+      status: 'success',
+      data: null,
+    });
+  } catch (error) {
+    response.status(404).json({
+      status: 'fail',
+      message: 'Tour not found',
+    });
+  }
 }
 
 const tourControllers = {
   getAllTours,
   getTourByID,
   updateTour,
-  deleteTour,
+  deleteTourByID,
   createTour,
 };
 
