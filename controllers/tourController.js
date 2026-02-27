@@ -34,7 +34,15 @@ async function getAllTours(request, response) {
   );
   const queryStringParsed = JSON.parse(queryString);
 
-  const query = Tour.find(queryStringParsed);
+  let query = Tour.find(queryStringParsed);
+
+  if (request.query.sort) {
+    const sortBy = request.query.sort.split(',').join(' ');
+    query = query.sort(sortBy);
+  } else {
+    query = query.sort('-createdAt');
+  }
+
   const foundTour = await query;
 
   if (foundTour.length <= 0) {
