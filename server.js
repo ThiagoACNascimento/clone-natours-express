@@ -1,6 +1,6 @@
 import './config.env.js';
-import app from './app.js';
 import mongoose from 'mongoose';
+import app from './app.js';
 
 mongoose
   .connect(process.env.DB_URL, {

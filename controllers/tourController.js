@@ -22,7 +22,35 @@ async function createTour(request, response) {
 }
 
 async function getAllTours(request, response) {
-  const foundTour = await Tour.find();
+  const queryObject = { ...request.query };
+  const excludedFields = ['page', 'sort', 'limit', 'fields'];
+
+  excludedFields.forEach((element) => delete queryObject[element]);
+
+  let queryString = JSON.stringify(queryObject);
+  queryString = queryString.replace(
+    /\b(gte|gt|lte|lt)\b/g,
+    (match) => `$${match}`,
+  );
+  const queryStringParsed = JSON.parse(queryString);
+
+  let query = Tour.find(queryStringParsed);
+
+  if (request.query.sort) {
+    const sortBy = request.query.sort.split(',').join(' ');
+    query = query.sort(sortBy);
+  } else {
+    query = query.sort('-createdAt');
+  }
+
+  if (request.query.fields) {
+    const fieldBy = `${request.query.fields.split(',').join(' ')} -__v`;
+    query = query.select(fieldBy);
+  } else {
+    query = query.select('-__v');
+  }
+
+  const foundTour = await query;
 
   if (foundTour.length <= 0) {
     return response.status(404).json({
