@@ -27,7 +27,14 @@ async function getAllTours(request, response) {
 
   excludedFields.forEach((element) => delete queryObject[element]);
 
-  const query = Tour.find(queryObject);
+  let queryString = JSON.stringify(queryObject);
+  queryString = queryString.replace(
+    /\b(gte|gt|lte|lt)\b/g,
+    (match) => `$${match}`,
+  );
+  const queryStringParsed = JSON.parse(queryString);
+
+  const query = Tour.find(queryStringParsed);
   const foundTour = await query;
 
   if (foundTour.length <= 0) {
