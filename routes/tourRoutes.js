@@ -3,12 +3,12 @@ import tourControllers from '../controllers/tourController.js';
 
 const tourRouter = e.Router();
 
-tourRouter.param('id', tourControllers.checkID);
+// tourRouter.param('id', tourControllers.checkID);
 
 tourRouter
   .route('/')
-  .get(tourControllers.getAllTours)
-  .post(tourControllers.checkBody, tourControllers.createTour);
+  .post(tourControllers.createTour)
+  .get(tourControllers.getAllTours);
 tourRouter
   .route('/:id')
   .get(tourControllers.getTourByID)

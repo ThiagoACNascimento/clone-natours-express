@@ -1,28 +1,24 @@
-import fs from 'fs';
+import Tour from '../models/tourModel.js';
 
-const tours = JSON.parse(fs.readFileSync('./dev-data/data/tours-simple.json'));
+async function createTour(request, response) {
+  // const newTour = new Tour({});
+  // newTour.save();
 
-function checkID(request, response, next) {
-  const id = request.params.id * 1;
+  try {
+    const newTour = await Tour.create(request.body);
 
-  if (id > tours.length || id < 0) {
-    return response.status(404).json({
+    response.status(201).json({
+      status: 'success',
+      data: {
+        tours: newTour,
+      },
+    });
+  } catch (error) {
+    response.status(400).json({
       status: 'fail',
-      message: 'Invalid ID',
+      message: 'Invalid data sent!',
     });
   }
-
-  next();
-}
-
-function checkBody(request, response, next) {
-  if (!request.body.name || !request.body.price) {
-    return response.status(400).json({
-      status: 'fail',
-      message: 'Invalid Body',
-    });
-  }
-  next();
 }
 
 function getAllTours(request, response) {
@@ -37,43 +33,12 @@ function getAllTours(request, response) {
 }
 
 function getTourByID(request, response) {
-  const id = request.params.id * 1;
-
-  const tour = tours.find((el) => el.id === id);
-
   response.status(200).json({
     status: 'success',
     data: {
       tour,
     },
   });
-}
-
-function createTour(request, response) {
-  const newId = tours[tours.length - 1].id + 1;
-  const newTour = Object.assign({ id: newId }, ...request.body);
-
-  tours.push(newTour);
-
-  fs.writeFile(
-    './dev-data/data/tours-simple.json',
-    JSON.stringify(tours),
-    (err) => {
-      if (err) {
-        return response.status(400).json({
-          status: 'fail',
-          message: 'Write file error',
-        });
-      }
-
-      response.status(201).json({
-        status: 'success',
-        data: {
-          tours: newTour,
-        },
-      });
-    },
-  );
 }
 
 function updateTour(request, response) {
@@ -97,8 +62,6 @@ function deleteTour(request, response) {
 }
 
 const tourControllers = {
-  checkID,
-  checkBody,
   getAllTours,
   getTourByID,
   updateTour,
