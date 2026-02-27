@@ -5,12 +5,12 @@ async function createTour(request, response) {
   // newTour.save();
 
   try {
-    const newTour = await Tour.create(request.body);
+    const createdTour = await Tour.create(request.body);
 
     response.status(201).json({
       status: 'success',
       data: {
-        tours: newTour,
+        tours: createdTour,
       },
     });
   } catch (error) {
@@ -21,24 +21,44 @@ async function createTour(request, response) {
   }
 }
 
-function getAllTours(request, response) {
+async function getAllTours(request, response) {
+  const foundTour = await Tour.find();
+
+  if (foundTour.length <= 0) {
+    return response.status(404).json({
+      status: 'fail',
+      message: 'Tours not found',
+    });
+  }
+
   response.status(200).json({
     status: 'success',
-    results: tours.length,
+    results: foundTour.length,
     requested: request.requestTime,
     data: {
-      tours,
+      foundTour,
     },
   });
 }
 
-function getTourByID(request, response) {
-  response.status(200).json({
-    status: 'success',
-    data: {
-      tour,
-    },
-  });
+async function getTourByID(request, response) {
+  try {
+    const { id } = request.params;
+    const foundTour = await Tour.findById(id);
+    // Tour.findOne({ _id: id });
+
+    response.status(200).json({
+      status: 'success',
+      data: {
+        foundTour,
+      },
+    });
+  } catch (error) {
+    response.status(404).json({
+      status: 'fail',
+      message: 'Tour not found',
+    });
+  }
 }
 
 function updateTour(request, response) {
