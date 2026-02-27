@@ -45,7 +45,7 @@ async function getTourByID(request, response) {
   try {
     const { id } = request.params;
     const foundTour = await Tour.findById(id);
-    // Tour.findOne({ _id: id });
+    // Tour.findOne({ _id: id }); -- Same thing
 
     response.status(200).json({
       status: 'success',
@@ -61,17 +61,26 @@ async function getTourByID(request, response) {
   }
 }
 
-function updateTour(request, response) {
-  const { name, duration, difficulty } = request.body;
+async function updateTour(request, response) {
+  try {
+    const { id } = request.params;
 
-  response.status(200).json({
-    status: 'success',
-    data: {
-      name,
-      duration,
-      difficulty,
-    },
-  });
+    const updatedTour = await Tour.findByIdAndUpdate(id, request.body, {
+      new: true,
+      runValidators: true,
+    });
+    response.status(200).json({
+      status: 'success',
+      data: {
+        updatedTour,
+      },
+    });
+  } catch (error) {
+    response.status(404).json({
+      status: 'fail',
+      message: 'Tour not found',
+    });
+  }
 }
 
 function deleteTour(request, response) {
