@@ -8,10 +8,11 @@
   "keywords": [],
   "license": "ISC",
   "scripts": {
-    "dev": "node --watch --no-warnings server.js",
-    "service:up": "docker compose -f docker-compose.yaml up -d",
-    "service:stop": "docker compose -f docker-compose.yaml stop",
-    "service:down": "docker compose -f docker-compose.yaml down",
+    "dev": "npm run services:up && npm run services:wait:database && node --watch --no-warnings server.js",
+    "services:up": "docker compose -f database/docker-compose.yaml up -d",
+    "services:stop": "docker compose -f database/docker-compose.yaml stop",
+    "services:down": "docker compose -f database/docker-compose.yaml down",
+    "services:wait:database": "node database/scripts/wait-for-mongodb.js",
     "lint:prettier:check": "prettier --check .",
     "lint:prettier:fix": "prettier --write ."
   },

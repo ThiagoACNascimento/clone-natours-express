@@ -114,6 +114,19 @@ async function deleteTourByID(request, response) {
   }
 }
 
+// async function getTourStats(request, response) {
+//   try {
+//     const stats = await Tour.aggregate([
+
+//     ])
+//   } catch (error) {
+//     response.status(404).json({
+//       sttaus: 'fail',
+//       message: error,
+//     });
+//   }
+// }
+
 const tourControllers = {
   createTour,
   getAllTours,
