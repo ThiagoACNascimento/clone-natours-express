@@ -114,23 +114,47 @@ async function deleteTourByID(request, response) {
   }
 }
 
-// async function getTourStats(request, response) {
-//   try {
-//     const stats = await Tour.aggregate([
+async function getTourStats(request, response) {
+  try {
+    const stats = await Tour.aggregate([
+      {
+        $match: { ratingsAverage: { $gte: 4.5 } },
+      },
+      {
+        $group: {
+          _id: { $toUpper: '$difficulty' },
+          numTours: { $sum: 1 },
+          numRatings: { $sum: '$ratingsQuantity' },
+          avgRating: { $avg: '$ratingsAverage' },
+          avgPrice: { $avg: '$price' },
+          minPrice: { $min: '$price' },
+          maxPrice: { $max: '$price' },
+        },
+      },
+      {
+        $sort: { avgPrice: 1 },
+      },
+    ]);
 
-//     ])
-//   } catch (error) {
-//     response.status(404).json({
-//       sttaus: 'fail',
-//       message: error,
-//     });
-//   }
-// }
+    response.status(200).json({
+      sttaus: 'success',
+      data: {
+        stats,
+      },
+    });
+  } catch (error) {
+    response.status(404).json({
+      sttaus: 'fail',
+      message: error,
+    });
+  }
+}
 
 const tourControllers = {
   createTour,
   getAllTours,
   getTourByID,
+  getTourStats,
   aliasTopTours,
   updateTour,
   deleteTourByID,
