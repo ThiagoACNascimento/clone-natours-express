@@ -3,6 +3,6 @@ services:
     container_name: 'mongo-dev'
     image: 'mongodb/mongodb-community-server:latest'
     env_file:
-      - ./.env.development
+      - ../.env.development
     ports:
       - '27017:27017'

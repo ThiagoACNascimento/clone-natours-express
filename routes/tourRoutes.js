@@ -14,6 +14,9 @@ tourRouter
   .route('/top-5-cheap')
   .get(tourControllers.aliasTopTours, tourControllers.getAllTours);
 
+tourRouter.route('/stats').get(tourControllers.getTourStats);
+tourRouter.route('/monthly-plan/:year').get(tourControllers.getMonthlyPlan);
+
 tourRouter
   .route('/:id')
   .get(tourControllers.getTourByID)
