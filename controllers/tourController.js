@@ -22,51 +22,62 @@ async function createTour(request, response) {
 }
 
 async function getAllTours(request, response) {
-  const queryObject = { ...request.query };
-  const excludedFields = ['page', 'sort', 'limit', 'fields'];
+  try {
+    const queryObject = { ...request.query };
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
 
-  excludedFields.forEach((element) => delete queryObject[element]);
+    excludedFields.forEach((element) => delete queryObject[element]);
 
-  let queryString = JSON.stringify(queryObject);
-  queryString = queryString.replace(
-    /\b(gte|gt|lte|lt)\b/g,
-    (match) => `$${match}`,
-  );
-  const queryStringParsed = JSON.parse(queryString);
+    let queryString = JSON.stringify(queryObject);
+    queryString = queryString.replace(
+      /\b(gte|gt|lte|lt)\b/g,
+      (match) => `$${match}`,
+    );
+    const queryStringParsed = JSON.parse(queryString);
 
-  let query = Tour.find(queryStringParsed);
+    let query = Tour.find(queryStringParsed);
 
-  if (request.query.sort) {
-    const sortBy = request.query.sort.split(',').join(' ');
-    query = query.sort(sortBy);
-  } else {
-    query = query.sort('-createdAt');
-  }
+    if (request.query.sort) {
+      const sortBy = request.query.sort.split(',').join(' ');
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort('-createdAt');
+    }
 
-  if (request.query.fields) {
-    const fieldBy = `${request.query.fields.split(',').join(' ')} -__v`;
-    query = query.select(fieldBy);
-  } else {
-    query = query.select('-__v');
-  }
+    if (request.query.fields) {
+      const fieldBy = `${request.query.fields.split(',').join(' ')} -__v`;
+      query = query.select(fieldBy);
+    } else {
+      query = query.select('-__v');
+    }
 
-  const foundTour = await query;
+    const page = Number(request.query.page) || 1;
+    const limitBy = Number(request.query.limit) || 100;
+    const skipBy = (page - 1) * limitBy;
+    const numberOfTours = await Tour.countDocuments();
 
-  if (foundTour.length <= 0) {
-    return response.status(404).json({
+    if (skipBy >= numberOfTours) {
+      throw new Error('This page not exist');
+    }
+
+    query = query.skip(skipBy).limit(limitBy);
+
+    const foundTour = await query;
+
+    response.status(200).json({
+      status: 'success',
+      results: foundTour.length,
+      requested: request.requestTime,
+      data: {
+        foundTour,
+      },
+    });
+  } catch (error) {
+    response.status(200).json({
       status: 'fail',
-      message: 'Tours not found',
+      message: error.message,
     });
   }
-
-  response.status(200).json({
-    status: 'success',
-    results: foundTour.length,
-    requested: request.requestTime,
-    data: {
-      foundTour,
-    },
-  });
 }
 
 async function getTourByID(request, response) {
