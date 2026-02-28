@@ -1,4 +1,5 @@
 import Tour from '../models/tourModel.js';
+import APIFeatures from '../utils/apiFeatures.js';
 
 async function createTour(request, response) {
   // const newTour = new Tour({});
@@ -22,51 +23,28 @@ async function createTour(request, response) {
 }
 
 async function getAllTours(request, response) {
-  const queryObject = { ...request.query };
-  const excludedFields = ['page', 'sort', 'limit', 'fields'];
+  try {
+    const features = new APIFeatures(Tour.find(), request.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const foundTour = await features.query;
 
-  excludedFields.forEach((element) => delete queryObject[element]);
-
-  let queryString = JSON.stringify(queryObject);
-  queryString = queryString.replace(
-    /\b(gte|gt|lte|lt)\b/g,
-    (match) => `$${match}`,
-  );
-  const queryStringParsed = JSON.parse(queryString);
-
-  let query = Tour.find(queryStringParsed);
-
-  if (request.query.sort) {
-    const sortBy = request.query.sort.split(',').join(' ');
-    query = query.sort(sortBy);
-  } else {
-    query = query.sort('-createdAt');
-  }
-
-  if (request.query.fields) {
-    const fieldBy = `${request.query.fields.split(',').join(' ')} -__v`;
-    query = query.select(fieldBy);
-  } else {
-    query = query.select('-__v');
-  }
-
-  const foundTour = await query;
-
-  if (foundTour.length <= 0) {
-    return response.status(404).json({
+    response.status(200).json({
+      status: 'success',
+      results: foundTour.length,
+      requested: request.requestTime,
+      data: {
+        foundTour,
+      },
+    });
+  } catch (error) {
+    response.status(200).json({
       status: 'fail',
-      message: 'Tours not found',
+      message: error.message,
     });
   }
-
-  response.status(200).json({
-    status: 'success',
-    results: foundTour.length,
-    requested: request.requestTime,
-    data: {
-      foundTour,
-    },
-  });
 }
 
 async function getTourByID(request, response) {
@@ -87,6 +65,13 @@ async function getTourByID(request, response) {
       message: 'Tour not found',
     });
   }
+}
+
+function aliasTopTours(request, response, next) {
+  request.query.limit = '5';
+  request.query.sort = '-ratingsAverage,price';
+  request.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+  next();
 }
 
 async function updateTour(request, response) {
@@ -130,11 +115,12 @@ async function deleteTourByID(request, response) {
 }
 
 const tourControllers = {
+  createTour,
   getAllTours,
   getTourByID,
+  aliasTopTours,
   updateTour,
   deleteTourByID,
-  createTour,
 };
 
 export default tourControllers;
