@@ -1,4 +1,5 @@
 import Tour from '../models/tourModel.js';
+import APIFeatures from '../utils/apiFeatures.js';
 
 async function createTour(request, response) {
   // const newTour = new Tour({});
@@ -23,46 +24,12 @@ async function createTour(request, response) {
 
 async function getAllTours(request, response) {
   try {
-    const queryObject = { ...request.query };
-    const excludedFields = ['page', 'sort', 'limit', 'fields'];
-
-    excludedFields.forEach((element) => delete queryObject[element]);
-
-    let queryString = JSON.stringify(queryObject);
-    queryString = queryString.replace(
-      /\b(gte|gt|lte|lt)\b/g,
-      (match) => `$${match}`,
-    );
-    const queryStringParsed = JSON.parse(queryString);
-
-    let query = Tour.find(queryStringParsed);
-
-    if (request.query.sort) {
-      const sortBy = request.query.sort.split(',').join(' ');
-      query = query.sort(sortBy);
-    } else {
-      query = query.sort('-createdAt');
-    }
-
-    if (request.query.fields) {
-      const fieldBy = `${request.query.fields.split(',').join(' ')} -__v`;
-      query = query.select(fieldBy);
-    } else {
-      query = query.select('-__v');
-    }
-
-    const page = Number(request.query.page) || 1;
-    const limitBy = Number(request.query.limit) || 100;
-    const skipBy = (page - 1) * limitBy;
-    const numberOfTours = await Tour.countDocuments();
-
-    if (skipBy >= numberOfTours) {
-      throw new Error('This page not exist');
-    }
-
-    query = query.skip(skipBy).limit(limitBy);
-
-    const foundTour = await query;
+    const features = new APIFeatures(Tour.find(), request.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const foundTour = await features.query;
 
     response.status(200).json({
       status: 'success',
@@ -98,6 +65,13 @@ async function getTourByID(request, response) {
       message: 'Tour not found',
     });
   }
+}
+
+function aliasTopTours(request, response, next) {
+  request.query.limit = '5';
+  request.query.sort = '-ratingsAverage,price';
+  request.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+  next();
 }
 
 async function updateTour(request, response) {
@@ -141,11 +115,12 @@ async function deleteTourByID(request, response) {
 }
 
 const tourControllers = {
+  createTour,
   getAllTours,
   getTourByID,
+  aliasTopTours,
   updateTour,
   deleteTourByID,
-  createTour,
 };
 
 export default tourControllers;
