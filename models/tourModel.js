@@ -88,10 +88,10 @@ tourSechema.pre(/^find/, function (next) {
   next();
 });
 
-tourSechema.post(/^find/, function (docs, next) {
-  const time = `Query took ${Date.now() - this.start} milliseconds`;
-  console.log(docs);
-  console.log(time);
+tourSechema.pre('aggregate', function (next) {
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+
+  console.log(this.pipeline());
   next();
 });
 
