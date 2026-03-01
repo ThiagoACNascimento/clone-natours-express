@@ -17,7 +17,7 @@ async function createTour(request, response) {
   } catch (error) {
     response.status(400).json({
       status: 'fail',
-      message: 'Invalid data sent!',
+      message: error,
     });
   }
 }
@@ -91,7 +91,7 @@ async function updateTour(request, response) {
   } catch (error) {
     response.status(404).json({
       status: 'fail',
-      message: 'Tour not found',
+      message: error,
     });
   }
 }
