@@ -3,7 +3,6 @@ import { exec } from 'node:child_process';
 function checkMongodb() {
   const command =
     'docker exec mongo-dev mongosh --quiet --eval "db.adminCommand(\'ping\')"';
-  exec(command, handlerReturn);
 
   function handlerReturn(error, stdout) {
     if (error || stdout.search('{ ok: 1 }') === 1) {
@@ -15,6 +14,7 @@ function checkMongodb() {
 
     console.log('\nConexão com o MongoDB concluída com sucesso!\n');
   }
+  exec(command, handlerReturn);
 }
 
 process.stdout.write('Aguardando MongoDB aceitar conexões');
