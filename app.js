@@ -13,11 +13,6 @@ if (process.env.NODE_ENV === 'development') {
 app.use(e.json());
 
 app.use((request, response, next) => {
-  console.log('Hello from the middleware');
-  next();
-});
-
-app.use((request, response, next) => {
   request.requestTime = new Date().toISOString();
   next();
 });
@@ -26,5 +21,24 @@ app.use((request, response, next) => {
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+
+app.all('*', (request, response, next) => {
+  const error = new Error(`Can't find ${request.originalUrl} on this server`);
+
+  error.status = 'fail';
+  error.statusCode = 404;
+
+  next(error);
+});
+
+app.use((error, request, response, next) => {
+  error.statusCode = error.statusCode || 500;
+  error.status = error.status || 'error';
+
+  response.status(error.statusCode).json({
+    status: error.status,
+    message: error.message,
+  });
+});
 
 export default app;
