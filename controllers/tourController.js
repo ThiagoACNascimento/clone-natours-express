@@ -1,5 +1,6 @@
 import Tour from '../models/tourModel.js';
 import APIFeatures from '../utils/apiFeatures.js';
+import AppError from '../utils/appError.js';
 import catcher from '../utils/catchAsync.js';
 
 const createTour = catcher.asyncFuction(async (request, response, next) => {
@@ -36,6 +37,10 @@ const getTourByID = catcher.asyncFuction(async (request, response, next) => {
   const foundTour = await Tour.findById(id);
   // Tour.findOne({ _id: id }); -- Same thing
 
+  if (!foundTour) {
+    return next(new AppError('No tour found with that ID', 404));
+  }
+
   response.status(200).json({
     status: 'success',
     data: {
@@ -58,6 +63,11 @@ const updateTour = catcher.asyncFuction(async (request, response, next) => {
     new: true,
     runValidators: true,
   });
+
+  if (!updatedTour) {
+    return next(new AppError('No tour found with that ID', 404));
+  }
+
   response.status(200).json({
     status: 'success',
     data: {
@@ -69,7 +79,11 @@ const updateTour = catcher.asyncFuction(async (request, response, next) => {
 const deleteTourByID = catcher.asyncFuction(async (request, response, next) => {
   const { id } = request.params;
 
-  await Tour.findByIdAndDelete(id);
+  const foundTour = await Tour.findByIdAndDelete(id);
+
+  if (!foundTour) {
+    return next(new AppError('No found tour with this ID', 404));
+  }
 
   response.status(204).json({
     status: 'success',
