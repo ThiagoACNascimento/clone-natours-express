@@ -2,6 +2,8 @@ import e from 'express';
 import morgan from 'morgan';
 import tourRouter from './routes/tourRoutes.js';
 import userRouter from './routes/userRoutes.js';
+import AppError from './utils/appError.js';
+import errorController from './controllers/errorController.js';
 
 const app = e();
 
@@ -23,22 +25,9 @@ app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 
 app.all('*', (request, response, next) => {
-  const error = new Error(`Can't find ${request.originalUrl} on this server`);
-
-  error.status = 'fail';
-  error.statusCode = 404;
-
-  next(error);
+  next(new AppError(`Can't find ${request.originalUrl} on this server`, 404));
 });
 
-app.use((error, request, response, next) => {
-  error.statusCode = error.statusCode || 500;
-  error.status = error.status || 'error';
-
-  response.status(error.statusCode).json({
-    status: error.status,
-    message: error.message,
-  });
-});
+app.use(errorController);
 
 export default app;
