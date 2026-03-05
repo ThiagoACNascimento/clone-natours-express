@@ -1,3 +1,4 @@
+import './utils/errors-init.js';
 import './config.env.js';
 import mongoose from 'mongoose';
 import app from './app.js';
@@ -19,7 +20,7 @@ const server = app.listen(process.env.SERVER_PORT, () => {
 
 process.on('unhandledRejection', (error) => {
   console.log(error.name, error.message);
-  console.log('UNHANDLER REJECTION');
+  console.log('UNHANDLER REJECTION... SHUTTING DOWN');
   server.close(() => {
     process.exit(1);
   });
