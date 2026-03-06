@@ -61,9 +61,26 @@ const login = catcher.asyncFuction(async (request, response, next) => {
   });
 });
 
+const protect = catcher.asyncFuction(async (request, response, next) => {
+  let token;
+
+  if (request.headers.authorization) {
+    token = request.headers.authorization.split(' ')[1];
+  }
+  // console.log(token);
+
+  if (!token) {
+    return next(
+      new AppError('You are not logged in! Please log in to get access', 401),
+    );
+  }
+  next();
+});
+
 const authController = {
   signUp,
   login,
+  protect,
 };
 
 export default authController;

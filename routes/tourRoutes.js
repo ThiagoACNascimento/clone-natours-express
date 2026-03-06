@@ -1,4 +1,5 @@
 import e from 'express';
+import authController from '../controllers/authController.js';
 import tourControllers from '../controllers/tourController.js';
 
 const tourRouter = e.Router();
@@ -8,7 +9,7 @@ const tourRouter = e.Router();
 tourRouter
   .route('/')
   .post(tourControllers.createTour)
-  .get(tourControllers.getAllTours);
+  .get(authController.protect, tourControllers.getAllTours);
 
 tourRouter
   .route('/top-5-cheap')
