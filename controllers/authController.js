@@ -13,6 +13,24 @@ function signToken(id) {
   });
 }
 
+function createSendToken(user, statusCode, response, isReturnUser) {
+  const token = signToken(user._id);
+
+  if (isReturnUser)
+    return response.status(statusCode).json({
+      status: 'success',
+      token,
+      data: {
+        user,
+      },
+    });
+
+  response.status(statusCode).json({
+    status: 'success',
+    token,
+  });
+}
+
 const signUp = catcher.asyncFuction(async (request, response, next) => {
   const { name, email, password, passwordConfirm, passwordChangedAt, role } =
     request.body;
@@ -25,15 +43,7 @@ const signUp = catcher.asyncFuction(async (request, response, next) => {
     role,
   });
 
-  const token = signToken(newUser._id);
-
-  response.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  createSendToken(newUser, 201, response, true);
 });
 
 const login = catcher.asyncFuction(async (request, response, next) => {
@@ -59,12 +69,7 @@ const login = catcher.asyncFuction(async (request, response, next) => {
     return next(new AppError('Incorrect email or password', 400));
   }
 
-  const token = signToken(user._id);
-
-  response.status(200).json({
-    status: 'success',
-    token,
-  });
+  createSendToken(user, 201, response, false);
 });
 
 const protect = catcher.asyncFuction(async (request, response, next) => {
@@ -181,12 +186,26 @@ const resetPassword = catcher.asyncFuction(async (request, response, next) => {
 
   await foundUser.save();
 
-  const reloginToken = signToken(foundUser._id);
+  createSendToken(foundUser, 200, response, false);
+});
 
-  response.status(200).json({
-    status: 'success',
-    token: reloginToken,
-  });
+const updatePassword = catcher.asyncFuction(async (request, response, next) => {
+  const user = await User.findById(request.user.id).select('+password');
+  const { password } = request.body;
+  const isPasswordCorrect = await user.correctPassword(password, user.password);
+
+  if (!isPasswordCorrect) {
+    return next(new AppError('Your current password is wrong', 401));
+  }
+
+  const { newPassword, newPasswordConfirm } = request.body;
+
+  user.password = newPassword;
+  user.passwordConfirm = newPasswordConfirm;
+
+  await user.save();
+
+  createSendToken(user, 200, response, false);
 });
 
 const authController = {
@@ -196,6 +215,7 @@ const authController = {
   restrictTo,
   forgotPassword,
   resetPassword,
+  updatePassword,
 };
 
 export default authController;
