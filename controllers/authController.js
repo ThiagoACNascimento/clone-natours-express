@@ -12,7 +12,7 @@ function signToken(id) {
 }
 
 const signUp = catcher.asyncFuction(async (request, response, next) => {
-  const { name, email, password, passwordConfirm, passwordChangedAt } =
+  const { name, email, password, passwordConfirm, passwordChangedAt, role } =
     request.body;
   const newUser = await User.create({
     name,
@@ -20,6 +20,7 @@ const signUp = catcher.asyncFuction(async (request, response, next) => {
     password,
     passwordConfirm,
     passwordChangedAt,
+    role,
   });
 
   const token = signToken(newUser._id);
@@ -105,10 +106,23 @@ const protect = catcher.asyncFuction(async (request, response, next) => {
   next();
 });
 
+const restrictTo = (...roles) => {
+  return (request, response, next) => {
+    if (!roles.includes(request.user.role)) {
+      return next(
+        new AppError('You do not have permission to perform this action', 403),
+      );
+    }
+
+    next();
+  };
+};
+
 const authController = {
   signUp,
   login,
   protect,
+  restrictTo,
 };
 
 export default authController;
