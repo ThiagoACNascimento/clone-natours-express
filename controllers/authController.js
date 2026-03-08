@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { promisify } from 'util';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
@@ -157,7 +158,36 @@ const forgotPassword = catcher.asyncFuction(async (request, response, next) => {
   });
 });
 
-const resetPassword = (request, response, next) => {};
+const resetPassword = catcher.asyncFuction(async (request, response, next) => {
+  const { token } = request.params;
+  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+  const foundUser = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+
+  if (!foundUser) {
+    return next(new AppError('Token is invalid or expired', 400));
+  }
+
+  const newPassword = request.body.password;
+  const newPasswordConfirm = request.body.passwordConfirm;
+
+  foundUser.password = newPassword;
+  foundUser.passwordConfirm = newPasswordConfirm;
+  foundUser.passwordResetToken = undefined;
+  foundUser.passwordResetExpires = undefined;
+
+  await foundUser.save();
+
+  const reloginToken = signToken(foundUser._id);
+
+  response.status(200).json({
+    status: 'success',
+    token: reloginToken,
+  });
+});
 
 const authController = {
   signUp,
