@@ -7,6 +7,9 @@ const userRouter = e.Router();
 userRouter.post('/signup', authController.signUp);
 userRouter.post('/login', authController.login);
 
+userRouter.post('/forgotPassword', authController.forgotPassword);
+userRouter.patch('/resetPassword/:token', authController.resetPassword);
+
 userRouter
   .route('/')
   .get(userController.getAllUsers)
