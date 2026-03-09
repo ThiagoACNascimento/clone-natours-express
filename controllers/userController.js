@@ -32,8 +32,6 @@ const updateMe = catcher.asyncFuction(async (request, response, next) => {
   if (name) updateFields.name = name;
   if (email) updateFields.email = email;
 
-  console.log(updateFields);
-
   const updatedUser = await User.findByIdAndUpdate(
     request.user.id,
     updateFields,
@@ -72,6 +70,15 @@ function updateUser(request, response) {
   });
 }
 
+const deleteMe = catcher.asyncFuction(async (request, response, next) => {
+  await User.findByIdAndUpdate(request.user.id, { active: false });
+
+  response.status(204).json({
+    status: 'success',
+    data: null,
+  });
+});
+
 function deleteUser(request, response) {
   response.status(500).json({
     status: 'error',
@@ -85,6 +92,7 @@ const userController = {
   createUser,
   updateMe,
   updateUser,
+  deleteMe,
   deleteUser,
 };
 
