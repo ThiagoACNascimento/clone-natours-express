@@ -1,4 +1,5 @@
 import User from '../models/userModel.js';
+import AppError from '../utils/appError.js';
 import catcher from '../utils/catchAsync.js';
 
 const getAllUsers = catcher.asyncFuction(async (request, response, next) => {
@@ -10,6 +11,42 @@ const getAllUsers = catcher.asyncFuction(async (request, response, next) => {
     requested: request.requestTime,
     data: {
       users,
+    },
+  });
+});
+
+const updateMe = catcher.asyncFuction(async (request, response, next) => {
+  const { password, passwordConfirm } = request.body;
+  if (password || passwordConfirm) {
+    return next(
+      new AppError(
+        'This route is not for password updates! Please use /updatePassword',
+        400,
+      ),
+    );
+  }
+
+  const { name, email } = request.body;
+  const updateFields = {};
+
+  if (name) updateFields.name = name;
+  if (email) updateFields.email = email;
+
+  console.log(updateFields);
+
+  const updatedUser = await User.findByIdAndUpdate(
+    request.user.id,
+    updateFields,
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+
+  response.status(200).json({
+    status: 'success',
+    data: {
+      user: updatedUser,
     },
   });
 });
@@ -46,6 +83,7 @@ const userController = {
   getAllUsers,
   getUserByID,
   createUser,
+  updateMe,
   updateUser,
   deleteUser,
 };
