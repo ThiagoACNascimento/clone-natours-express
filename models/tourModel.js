@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import slugify from 'slugify';
+// import User from './userModel.js';
 
 const tourSechema = new mongoose.Schema(
   {
@@ -76,6 +77,34 @@ const tourSechema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    startLocation: {
+      // Embedding
+      // GeoJSON
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coordinates: [Number],
+        address: String,
+        descriptions: String,
+        day: Number,
+      },
+    ],
+    // Embedding
+    // guides: Array,
+    guides: [{ type: mongoose.Schema.ObjectId, ref: 'User' }],
   },
   {
     toJSON: {
@@ -97,6 +126,16 @@ tourSechema.pre('save', function (next) {
   });
   next();
 });
+
+// Embedding situation
+// tourSechema.pre('save', async function (next) {
+//   const guidesPromieses = this.guides.map(
+//     async (id) => await User.findById(id),
+//   );
+
+//   this.guides = await Promise.all(guidesPromieses);
+//   next();
+// });
 
 tourSechema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
