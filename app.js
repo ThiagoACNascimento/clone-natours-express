@@ -1,6 +1,9 @@
 import e from 'express';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
+import mongoSanitize from 'express-mongo-sanitize';
+import xss from 'xss-clean';
 
 import tourRouter from './routes/tourRoutes.js';
 import userRouter from './routes/userRoutes.js';
@@ -9,7 +12,8 @@ import errorController from './controllers/errorController.js';
 
 const app = e();
 
-// 1 - MIDDLEWARES
+app.use(helmet());
+
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
@@ -21,14 +25,18 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-app.use(e.json());
+app.use(e.json({ limit: '10kb' }));
+
+app.use(mongoSanitize());
+
+app.use(xss());
 
 app.use((request, response, next) => {
   request.requestTime = new Date().toISOString();
   next();
 });
 
-// 2) ROUTES
+// ROUTES
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
