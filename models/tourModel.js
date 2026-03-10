@@ -104,7 +104,12 @@ const tourSechema = new mongoose.Schema(
     ],
     // Embedding
     // guides: Array,
-    guides: [{ type: mongoose.Schema.ObjectId, ref: 'User' }],
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   {
     toJSON: {
@@ -140,6 +145,15 @@ tourSechema.pre('save', function (next) {
 tourSechema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
   this.start = Date.now();
+  next();
+});
+
+tourSechema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt',
+  });
+
   next();
 });
 
