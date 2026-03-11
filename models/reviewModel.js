@@ -1,19 +1,20 @@
-import { model, Schema } from 'mongoose';
+import mongoose from 'mongoose';
 
-const reviewSchema = new Schema(
+const reviewSchema = new mongoose.Schema(
   {
     author: {
-      type: Schema.ObjectId,
+      type: mongoose.Schema.ObjectId,
       ref: 'User',
       required: [true, 'Review must belong to a user.'],
     },
     tour: {
-      type: Schema.ObjectId,
+      type: mongoose.Schema.ObjectId,
       ref: 'Tour',
       required: [true, 'Review must belong to a tour.'],
     },
     review: {
       type: String,
+      trim: true,
       required: [true, 'Review can not be empty!'],
     },
     rating: {
@@ -40,6 +41,6 @@ const reviewSchema = new Schema(
   },
 );
 
-const Review = model('Review', reviewSchema);
+const Review = mongoose.model('Review', reviewSchema);
 
 export default Review;
