@@ -10,6 +10,7 @@ import tourRouter from './routes/tourRoutes.js';
 import userRouter from './routes/userRoutes.js';
 import AppError from './utils/appError.js';
 import errorController from './controllers/errorController.js';
+import reviewRoute from './routes/reviewRoutes.js';
 
 const app = e();
 
@@ -54,6 +55,7 @@ app.use((request, response, next) => {
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRoute);
 
 app.all('*', (request, response, next) => {
   next(new AppError(`Can't find ${request.originalUrl} on this server`, 404));
