@@ -34,7 +34,7 @@ const getAllTours = catcher.asyncFuction(async (request, response, next) => {
 
 const getTourByID = catcher.asyncFuction(async (request, response, next) => {
   const { id } = request.params;
-  const foundTour = await Tour.findById(id);
+  const foundTour = await Tour.findById(id).populate('reviews');
   // Tour.findOne({ _id: id }); -- Same thing
 
   if (!foundTour) {
