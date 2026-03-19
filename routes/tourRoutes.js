@@ -1,6 +1,7 @@
 import e from 'express';
 import authController from '../controllers/authController.js';
 import tourControllers from '../controllers/tourController.js';
+import reviewController from '../controllers/reviewController.js';
 
 const tourRouter = e.Router();
 
@@ -26,6 +27,14 @@ tourRouter
     authController.protect,
     authController.restrictTo('admin', 'lead-guide'),
     tourControllers.deleteTourByID,
+  );
+
+tourRouter
+  .route('/:tourId/reviews')
+  .post(
+    authController.protect,
+    authController.restrictTo('user'),
+    reviewController.create,
   );
 
 export default tourRouter;

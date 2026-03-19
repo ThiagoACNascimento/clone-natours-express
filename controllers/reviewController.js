@@ -6,7 +6,8 @@ import APIFeatures from '../utils/apiFeatures.js';
 
 const create = catcher.asyncFuction(async (request, response, next) => {
   const authorId = request.user.id;
-  const { tourId, review, rating } = request.body;
+  const { tourId: bodyTourId, review, rating } = request.body;
+  const tourId = bodyTourId || request.params.tourId;
 
   const foundTour = await Tour.findById(tourId);
 
