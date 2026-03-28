@@ -13,4 +13,8 @@ reviewRoute
   )
   .get(authController.protect, reviewController.getAllReviews);
 
+reviewRoute
+  .route('/:tourId')
+  .get(authController.protect, reviewController.getOneReview);
+
 export default reviewRoute;

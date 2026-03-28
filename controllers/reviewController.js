@@ -53,9 +53,22 @@ const getAllReviews = catcher.asyncFuction(async (request, response, next) => {
   });
 });
 
+const getOneReview = catcher.asyncFuction(async (request, response, next) => {
+  const { tourId } = request.params;
+
+  const isFoundReview = await Review.findById({ tour: tourId });
+
+  if (!isFoundReview) {
+    return next(
+      new AppError('No reviews found for this tour. Try another tour.', 404),
+    );
+  }
+});
+
 const reviewController = {
   create,
   getAllReviews,
+  getOneReview,
 };
 
 export default reviewController;
