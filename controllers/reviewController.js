@@ -3,6 +3,7 @@ import Tour from '../models/tourModel.js';
 import catcher from '../utils/catchAsync.js';
 import AppError from '../utils/appError.js';
 import APIFeatures from '../utils/apiFeatures.js';
+import factory from './handlerFactory.js';
 
 const create = catcher.asyncFuction(async (request, response, next) => {
   const authorId = request.user.id;
@@ -65,10 +66,13 @@ const getOneReview = catcher.asyncFuction(async (request, response, next) => {
   }
 });
 
+const deleteReview = factory.deleteOne(Review);
+
 const reviewController = {
   create,
   getAllReviews,
   getOneReview,
+  deleteReview,
 };
 
 export default reviewController;

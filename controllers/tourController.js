@@ -2,6 +2,7 @@ import Tour from '../models/tourModel.js';
 import APIFeatures from '../utils/apiFeatures.js';
 import AppError from '../utils/appError.js';
 import catcher from '../utils/catchAsync.js';
+import factory from './handlerFactory.js';
 
 const createTour = catcher.asyncFuction(async (request, response, next) => {
   const createdTour = await Tour.create(request.body);
@@ -76,20 +77,7 @@ const updateTour = catcher.asyncFuction(async (request, response, next) => {
   });
 });
 
-const deleteTourByID = catcher.asyncFuction(async (request, response, next) => {
-  const { id } = request.params;
-
-  const foundTour = await Tour.findByIdAndDelete(id);
-
-  if (!foundTour) {
-    return next(new AppError('No found tour with this ID', 404));
-  }
-
-  response.status(204).json({
-    status: 'success',
-    data: null,
-  });
-});
+const deleteTourByID = factory.deleteOne(Tour);
 
 const getTourStats = catcher.asyncFuction(async (request, response, next) => {
   const stats = await Tour.aggregate([

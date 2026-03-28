@@ -29,6 +29,10 @@ userRouter
   .route('/:id')
   .get(userController.getUserByID)
   .patch(userController.updateUser)
-  .delete(userController.deleteUser);
+  .delete(
+    authController.protect,
+    authController.restrictTo('admin'),
+    userController.deleteUser,
+  );
 
 export default userRouter;
