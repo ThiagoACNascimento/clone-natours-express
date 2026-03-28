@@ -1,6 +1,7 @@
 import User from '../models/userModel.js';
 import AppError from '../utils/appError.js';
 import catcher from '../utils/catchAsync.js';
+import factory from './handlerFactory.js';
 
 const getAllUsers = catcher.asyncFuction(async (request, response, next) => {
   const users = await User.find();
@@ -79,12 +80,7 @@ const deleteMe = catcher.asyncFuction(async (request, response, next) => {
   });
 });
 
-function deleteUser(request, response) {
-  response.status(500).json({
-    status: 'error',
-    message: 'This route is not yet defined',
-  });
-}
+const deleteUser = factory.deleteOne(User);
 
 const userController = {
   getAllUsers,

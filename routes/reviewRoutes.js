@@ -8,9 +8,17 @@ reviewRoute
   .route('/')
   .post(
     authController.protect,
-    authController.restrictTo('user'),
+    authController.restrictTo('user', 'admin'),
     reviewController.create,
   )
   .get(authController.protect, reviewController.getAllReviews);
+
+reviewRoute
+  .route('/:tourId')
+  .get(authController.protect, reviewController.getOneReview);
+
+reviewRoute
+  .route('/:id')
+  .delete(authController.protect, reviewController.deleteReview);
 
 export default reviewRoute;
