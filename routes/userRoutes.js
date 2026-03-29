@@ -24,7 +24,11 @@ userRouter
 userRouter
   .route('/')
   .get(userController.getAllUsers)
-  .post(userController.createUser);
+  .post(
+    authController.protect,
+    authController.restrictTo('admin'),
+    userController.createUser,
+  );
 userRouter
   .route('/:id')
   .get(userController.getUserByID)

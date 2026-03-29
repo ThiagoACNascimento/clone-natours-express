@@ -4,16 +4,7 @@ import AppError from '../utils/appError.js';
 import catcher from '../utils/catchAsync.js';
 import factory from './handlerFactory.js';
 
-const createTour = catcher.asyncFuction(async (request, response, next) => {
-  const createdTour = await Tour.create(request.body);
-
-  response.status(201).json({
-    status: 'success',
-    data: {
-      tours: createdTour,
-    },
-  });
-});
+const createTour = factory.createOne(Tour);
 
 const getAllTours = catcher.asyncFuction(async (request, response, next) => {
   const features = new APIFeatures(Tour.find(), request.query)

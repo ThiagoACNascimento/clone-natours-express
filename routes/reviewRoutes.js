@@ -9,6 +9,7 @@ reviewRoute
   .post(
     authController.protect,
     authController.restrictTo('user', 'admin'),
+    reviewController.setTourUserIds,
     reviewController.create,
   )
   .get(authController.protect, reviewController.getAllReviews);

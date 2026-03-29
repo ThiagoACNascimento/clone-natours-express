@@ -50,12 +50,7 @@ const updateMe = catcher.asyncFuction(async (request, response, next) => {
   });
 });
 
-function createUser(request, response) {
-  response.status(500).json({
-    status: 'error',
-    message: 'This route is not yet defined',
-  });
-}
+const createUser = factory.createOne(User);
 
 function getUserByID(request, response) {
   response.status(500).json({

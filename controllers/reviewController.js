@@ -5,7 +5,7 @@ import AppError from '../utils/appError.js';
 import APIFeatures from '../utils/apiFeatures.js';
 import factory from './handlerFactory.js';
 
-const create = catcher.asyncFuction(async (request, response, next) => {
+const setTourUserIds = catcher.asyncFuction(async (request, response, next) => {
   const authorId = request.user.id;
   const { tourId: bodyTourId, review, rating } = request.body;
   const tourId = bodyTourId || request.params.tourId;
@@ -25,15 +25,11 @@ const create = catcher.asyncFuction(async (request, response, next) => {
     tour: foundTour,
   };
 
-  const createdReview = await Review.create(info);
-
-  response.status(201).json({
-    status: 'success',
-    data: {
-      review: createdReview,
-    },
-  });
+  request.body = info;
+  next();
 });
+
+const create = factory.createOne(Review);
 
 const getAllReviews = catcher.asyncFuction(async (request, response, next) => {
   const features = new APIFeatures(Review.find(), request.query)
@@ -71,6 +67,7 @@ const updateReview = factory.updateOne(Review);
 const deleteReview = factory.deleteOne(Review);
 
 const reviewController = {
+  setTourUserIds,
   create,
   getAllReviews,
   getOneReview,
