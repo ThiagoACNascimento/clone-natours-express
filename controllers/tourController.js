@@ -57,25 +57,7 @@ function aliasTopTours(request, response, next) {
   next();
 }
 
-const updateTour = catcher.asyncFuction(async (request, response, next) => {
-  const { id } = request.params;
-
-  const updatedTour = await Tour.findByIdAndUpdate(id, request.body, {
-    new: true,
-    runValidators: true,
-  });
-
-  if (!updatedTour) {
-    return next(new AppError('No tour found with that ID', 404));
-  }
-
-  response.status(200).json({
-    status: 'success',
-    data: {
-      updatedTour,
-    },
-  });
-});
+const updateTour = factory.updateOne(Tour);
 
 const deleteTourByID = factory.deleteOne(Tour);
 

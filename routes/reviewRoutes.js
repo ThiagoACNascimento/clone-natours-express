@@ -19,6 +19,11 @@ reviewRoute
 
 reviewRoute
   .route('/:id')
+  .patch(
+    authController.protect,
+    authController.restrictTo('admin'),
+    reviewController.updateReview,
+  )
   .delete(authController.protect, reviewController.deleteReview);
 
 export default reviewRoute;

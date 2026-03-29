@@ -66,12 +66,15 @@ const getOneReview = catcher.asyncFuction(async (request, response, next) => {
   }
 });
 
+const updateReview = factory.updateOne(Review);
+
 const deleteReview = factory.deleteOne(Review);
 
 const reviewController = {
   create,
   getAllReviews,
   getOneReview,
+  updateReview,
   deleteReview,
 };
 
