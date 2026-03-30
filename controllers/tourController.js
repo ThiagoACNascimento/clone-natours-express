@@ -1,45 +1,12 @@
 import Tour from '../models/tourModel.js';
-import APIFeatures from '../utils/apiFeatures.js';
-import AppError from '../utils/appError.js';
 import catcher from '../utils/catchAsync.js';
 import factory from './handlerFactory.js';
 
 const createTour = factory.createOne(Tour);
 
-const getAllTours = catcher.asyncFuction(async (request, response, next) => {
-  const features = new APIFeatures(Tour.find(), request.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-  const foundTour = await features.query;
+const getAllTours = factory.getAll(Tour);
 
-  response.status(200).json({
-    status: 'success',
-    results: foundTour.length,
-    requested: request.requestTime,
-    data: {
-      foundTour,
-    },
-  });
-});
-
-const getTourByID = catcher.asyncFuction(async (request, response, next) => {
-  const { id } = request.params;
-  const foundTour = await Tour.findById(id).populate('reviews');
-  // Tour.findOne({ _id: id }); -- Same thing
-
-  if (!foundTour) {
-    return next(new AppError('No tour found with that ID', 404));
-  }
-
-  response.status(200).json({
-    status: 'success',
-    data: {
-      foundTour,
-    },
-  });
-});
+const getTourByID = factory.getOne(Tour, { path: 'reviews' });
 
 function aliasTopTours(request, response, next) {
   request.query.limit = '5';

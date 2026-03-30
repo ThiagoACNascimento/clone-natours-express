@@ -15,11 +15,8 @@ reviewRoute
   .get(authController.protect, reviewController.getAllReviews);
 
 reviewRoute
-  .route('/:tourId')
-  .get(authController.protect, reviewController.getOneReview);
-
-reviewRoute
   .route('/:id')
+  .get(reviewController.getOneById)
   .patch(
     authController.protect,
     authController.restrictTo('admin'),

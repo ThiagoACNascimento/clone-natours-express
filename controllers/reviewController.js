@@ -2,7 +2,6 @@ import Review from '../models/reviewModel.js';
 import Tour from '../models/tourModel.js';
 import catcher from '../utils/catchAsync.js';
 import AppError from '../utils/appError.js';
-import APIFeatures from '../utils/apiFeatures.js';
 import factory from './handlerFactory.js';
 
 const setTourUserIds = catcher.asyncFuction(async (request, response, next) => {
@@ -31,36 +30,9 @@ const setTourUserIds = catcher.asyncFuction(async (request, response, next) => {
 
 const create = factory.createOne(Review);
 
-const getAllReviews = catcher.asyncFuction(async (request, response, next) => {
-  const features = new APIFeatures(Review.find(), request.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
+const getAllReviews = factory.getAll(Review);
 
-  const foundReviews = await features.query;
-
-  response.status(200).json({
-    status: 'success',
-    results: foundReviews.length,
-    requested: request.requestTime,
-    data: {
-      reviews: foundReviews,
-    },
-  });
-});
-
-const getOneReview = catcher.asyncFuction(async (request, response, next) => {
-  const { tourId } = request.params;
-
-  const isFoundReview = await Review.findById({ tour: tourId });
-
-  if (!isFoundReview) {
-    return next(
-      new AppError('No reviews found for this tour. Try another tour.', 404),
-    );
-  }
-});
+const getOneById = factory.getOne(Review);
 
 const updateReview = factory.updateOne(Review);
 
@@ -70,7 +42,7 @@ const reviewController = {
   setTourUserIds,
   create,
   getAllReviews,
-  getOneReview,
+  getOneById,
   updateReview,
   deleteReview,
 };
