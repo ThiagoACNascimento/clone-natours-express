@@ -3,18 +3,7 @@ import AppError from '../utils/appError.js';
 import catcher from '../utils/catchAsync.js';
 import factory from './handlerFactory.js';
 
-const getAllUsers = catcher.asyncFuction(async (request, response, next) => {
-  const users = await User.find();
-
-  response.status(200).json({
-    status: 'success',
-    results: users.length,
-    requested: request.requestTime,
-    data: {
-      users,
-    },
-  });
-});
+const getAllUsers = factory.getAll(User);
 
 const updateMe = catcher.asyncFuction(async (request, response, next) => {
   const { password, passwordConfirm } = request.body;
@@ -50,26 +39,11 @@ const updateMe = catcher.asyncFuction(async (request, response, next) => {
   });
 });
 
-function createUser(request, response) {
-  response.status(500).json({
-    status: 'error',
-    message: 'This route is not yet defined',
-  });
-}
+const createUser = factory.createOne(User);
 
-function getUserByID(request, response) {
-  response.status(500).json({
-    status: 'error',
-    message: 'This route is not yet defined',
-  });
-}
+const getUserByID = factory.getOne(User);
 
-function updateUser(request, response) {
-  response.status(500).json({
-    status: 'error',
-    message: 'This route is not yet defined',
-  });
-}
+const updateUser = factory.updateOne(User);
 
 const deleteMe = catcher.asyncFuction(async (request, response, next) => {
   await User.findByIdAndUpdate(request.user.id, { active: false });

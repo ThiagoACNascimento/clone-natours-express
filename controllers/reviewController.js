@@ -2,10 +2,9 @@ import Review from '../models/reviewModel.js';
 import Tour from '../models/tourModel.js';
 import catcher from '../utils/catchAsync.js';
 import AppError from '../utils/appError.js';
-import APIFeatures from '../utils/apiFeatures.js';
 import factory from './handlerFactory.js';
 
-const create = catcher.asyncFuction(async (request, response, next) => {
+const setTourUserIds = catcher.asyncFuction(async (request, response, next) => {
   const authorId = request.user.id;
   const { tourId: bodyTourId, review, rating } = request.body;
   const tourId = bodyTourId || request.params.tourId;
@@ -25,53 +24,26 @@ const create = catcher.asyncFuction(async (request, response, next) => {
     tour: foundTour,
   };
 
-  const createdReview = await Review.create(info);
-
-  response.status(201).json({
-    status: 'success',
-    data: {
-      review: createdReview,
-    },
-  });
+  request.body = info;
+  next();
 });
 
-const getAllReviews = catcher.asyncFuction(async (request, response, next) => {
-  const features = new APIFeatures(Review.find(), request.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
+const create = factory.createOne(Review);
 
-  const foundReviews = await features.query;
+const getAllReviews = factory.getAll(Review);
 
-  response.status(200).json({
-    status: 'success',
-    results: foundReviews.length,
-    requested: request.requestTime,
-    data: {
-      reviews: foundReviews,
-    },
-  });
-});
+const getOneById = factory.getOne(Review);
 
-const getOneReview = catcher.asyncFuction(async (request, response, next) => {
-  const { tourId } = request.params;
-
-  const isFoundReview = await Review.findById({ tour: tourId });
-
-  if (!isFoundReview) {
-    return next(
-      new AppError('No reviews found for this tour. Try another tour.', 404),
-    );
-  }
-});
+const updateReview = factory.updateOne(Review);
 
 const deleteReview = factory.deleteOne(Review);
 
 const reviewController = {
+  setTourUserIds,
   create,
   getAllReviews,
-  getOneReview,
+  getOneById,
+  updateReview,
   deleteReview,
 };
 
