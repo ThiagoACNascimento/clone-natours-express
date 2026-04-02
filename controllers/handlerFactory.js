@@ -54,6 +54,7 @@ const getAll = (Model) =>
       .limitFields()
       .paginate();
 
+    // const foundDocument = await features.query.explain();
     const foundDocument = await features.query;
 
     response.status(200).json({
