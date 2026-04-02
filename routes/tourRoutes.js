@@ -9,7 +9,11 @@ const tourRouter = e.Router();
 
 tourRouter
   .route('/')
-  .post(tourControllers.createTour)
+  .post(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide'),
+    tourControllers.createTour,
+  )
   .get(authController.protect, tourControllers.getAllTours);
 
 tourRouter
@@ -17,12 +21,23 @@ tourRouter
   .get(tourControllers.aliasTopTours, tourControllers.getAllTours);
 
 tourRouter.route('/stats').get(tourControllers.getTourStats);
-tourRouter.route('/monthly-plan/:year').get(tourControllers.getMonthlyPlan);
+
+tourRouter
+  .route('/monthly-plan/:year')
+  .get(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide', 'guide'),
+    tourControllers.getMonthlyPlan,
+  );
 
 tourRouter
   .route('/:id')
   .get(tourControllers.getTourByID)
-  .patch(tourControllers.updateTour)
+  .patch(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide'),
+    tourControllers.updateTour,
+  )
   .delete(
     authController.protect,
     authController.restrictTo('admin', 'lead-guide'),

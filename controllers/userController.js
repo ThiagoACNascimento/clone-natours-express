@@ -43,6 +43,11 @@ const createUser = factory.createOne(User);
 
 const getUserByID = factory.getOne(User);
 
+const getMe = async (request, response, next) => {
+  request.params.id = request.user.id;
+  next();
+};
+
 const updateUser = factory.updateOne(User);
 
 const deleteMe = catcher.asyncFuction(async (request, response, next) => {
@@ -59,6 +64,7 @@ const deleteUser = factory.deleteOne(User);
 const userController = {
   getAllUsers,
   getUserByID,
+  getMe,
   createUser,
   updateMe,
   updateUser,
