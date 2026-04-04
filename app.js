@@ -14,6 +14,9 @@ import reviewRoute from './routes/reviewRoutes.js';
 
 const app = e();
 
+app.set('view engine', 'pug');
+app.set('views', './views');
+
 app.use(helmet());
 
 if (process.env.NODE_ENV === 'development') {
@@ -52,6 +55,9 @@ app.use((request, response, next) => {
 });
 
 // ROUTES
+app.get('/', (request, response) => {
+  response.status(200).render('base');
+});
 
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
