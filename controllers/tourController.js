@@ -1,4 +1,5 @@
 import Tour from '../models/tourModel.js';
+import AppError from '../utils/appError.js';
 import catcher from '../utils/catchAsync.js';
 import factory from './handlerFactory.js';
 
@@ -92,12 +93,83 @@ const getMonthlyPlan = catcher.asyncFuction(async (request, response, next) => {
   });
 });
 
+const getTourWithin = catcher.asyncFuction(async (request, response, next) => {
+  const { distance, latlng, unit } = request.params;
+  const [lat, lng] = latlng.split(',');
+  const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
+
+  if (!lat || !lng) {
+    next(
+      new AppError(
+        'Plase provide latitude and longitude in the format lat, lng',
+        400,
+      ),
+    );
+  }
+
+  const tours = await Tour.find({
+    startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radius] } },
+  });
+
+  response.status(200).json({
+    status: 'success',
+    results: tours.length,
+    data: {
+      data: tours,
+    },
+  });
+});
+
+const getDistances = catcher.asyncFuction(async (request, response, next) => {
+  const { latlng, unit } = request.params;
+  const [lat, lng] = latlng.split(',');
+
+  const multiplier = unit === 'mi' ? 0.000621371 : 0.001;
+
+  if (!lat || !lng) {
+    next(
+      new AppError(
+        'Plase provide latitude and longitude in the format lat, lng',
+        400,
+      ),
+    );
+  }
+
+  const distances = await Tour.aggregate([
+    {
+      $geoNear: {
+        near: {
+          type: 'Point',
+          coordinates: [lng * 1, lat * 1],
+        },
+        distanceField: 'distance',
+        distanceMultiplier: multiplier,
+      },
+    },
+    {
+      $project: {
+        distance: 1,
+        name: 1,
+      },
+    },
+  ]);
+
+  response.status(200).json({
+    status: 'success',
+    data: {
+      data: distances,
+    },
+  });
+});
+
 const tourControllers = {
   createTour,
   getAllTours,
   getTourByID,
   getTourStats,
   getMonthlyPlan,
+  getTourWithin,
+  getDistances,
   aliasTopTours,
   updateTour,
   deleteTourByID,
