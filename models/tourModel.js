@@ -169,10 +169,10 @@ tourSechema.pre(/^find/, function (next) {
   next();
 });
 
-tourSechema.pre('aggregate', function (next) {
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
-  next();
-});
+// tourSechema.pre('aggregate', function (next) {
+//   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+//   next();
+// });
 
 const Tour = mongoose.model('Tour', tourSechema);
 

@@ -48,6 +48,10 @@ tourRouter
   .route('/tours-within/:distance/center/:latlng/unit/:unit')
   .get(tourControllers.getTourWithin);
 
+tourRouter
+  .route('/distances/:latlng/unit/:unit')
+  .get(tourControllers.getDistances);
+
 tourRouter.use('/:tourId/reviews', reviewRoute);
 
 export default tourRouter;
