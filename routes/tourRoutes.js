@@ -44,6 +44,10 @@ tourRouter
     tourControllers.deleteTourByID,
   );
 
+tourRouter
+  .route('/tours-within/:distance/center/:latlng/unit/:unit')
+  .get(tourControllers.getTourWithin);
+
 tourRouter.use('/:tourId/reviews', reviewRoute);
 
 export default tourRouter;
