@@ -10,11 +10,18 @@ const getOverview = catcher.asyncFuction(async (request, response, next) => {
   });
 });
 
-const getTour = (request, response) => {
-  response.status(200).render('tour', {
-    title: 'The Forest Hiker Tour',
+const getTour = catcher.asyncFuction(async (request, response) => {
+  const { slug } = request.params;
+  const tour = await Tour.findOne({ slug }).populate({
+    path: 'reviews',
+    fields: 'review rating author',
   });
-};
+
+  response.status(200).render('tour', {
+    title: tour.name,
+    tour,
+  });
+});
 
 const viewController = {
   getOverview,

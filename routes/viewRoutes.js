@@ -4,6 +4,6 @@ import viewController from '../controllers/viewController.js';
 const viewRouter = e.Router();
 
 viewRouter.get('/', viewController.getOverview);
-viewRouter.get('/tour', viewController.getTour);
+viewRouter.get('/tour/:slug', viewController.getTour);
 
 export default viewRouter;
