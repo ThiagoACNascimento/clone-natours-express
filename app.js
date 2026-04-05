@@ -17,6 +17,7 @@ const app = e();
 app.set('view engine', 'pug');
 app.set('views', './views');
 
+app.use(e.static('./public'));
 app.use(helmet());
 
 if (process.env.NODE_ENV === 'development') {
@@ -56,7 +57,10 @@ app.use((request, response, next) => {
 
 // ROUTES
 app.get('/', (request, response) => {
-  response.status(200).render('base');
+  response.status(200).render('base', {
+    tour: 'The Forest Hiker',
+    user: 'Jonas',
+  });
 });
 
 app.use('/api/v1/tours', tourRouter);
