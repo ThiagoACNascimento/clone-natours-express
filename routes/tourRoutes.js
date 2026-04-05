@@ -14,7 +14,7 @@ tourRouter
     authController.restrictTo('admin', 'lead-guide'),
     tourControllers.createTour,
   )
-  .get(authController.protect, tourControllers.getAllTours);
+  .get(tourControllers.getAllTours);
 
 tourRouter
   .route('/top-5-cheap')
