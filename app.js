@@ -11,6 +11,7 @@ import userRouter from './routes/userRoutes.js';
 import AppError from './utils/appError.js';
 import errorController from './controllers/errorController.js';
 import reviewRoute from './routes/reviewRoutes.js';
+import viewRouter from './routes/viewRoutes.js';
 
 const app = e();
 
@@ -56,13 +57,7 @@ app.use((request, response, next) => {
 });
 
 // ROUTES
-app.get('/', (request, response) => {
-  response.status(200).render('base', {
-    tour: 'The Forest Hiker',
-    user: 'Jonas',
-  });
-});
-
+app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRoute);
