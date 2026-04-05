@@ -19,7 +19,46 @@ app.set('view engine', 'pug');
 app.set('views', './views');
 
 app.use(e.static('./public'));
-app.use(helmet());
+// Substitua app.use(helmet()); por isso:
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      baseUri: ["'self'"],
+      fontSrc: ["'self'", 'https:', 'data:'],
+      scriptSrc: [
+        "'self'",
+        'https://*.mapbox.com',
+        'https://api.mapbox.com',
+        'blob:',
+      ],
+      frameSrc: ["'self'", 'https://*.mapbox.com'],
+      objectSrc: ["'none'"],
+      styleSrc: [
+        "'self'",
+        'https://*.mapbox.com',
+        'https://api.mapbox.com',
+        'https://fonts.googleapis.com',
+      ],
+      workerSrc: ["'self'", 'blob:'],
+      childSrc: ["'self'", 'blob:'],
+      imgSrc: [
+        "'self'",
+        'data:',
+        'blob:',
+        'https://*.mapbox.com',
+        'https://api.mapbox.com',
+      ],
+      connectSrc: [
+        "'self'",
+        'https://*.mapbox.com',
+        'https://api.mapbox.com',
+        'https://events.mapbox.com',
+      ],
+      upgradeInsecureRequests: [],
+    },
+  }),
+);
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
