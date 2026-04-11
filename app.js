@@ -5,6 +5,8 @@ import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
 import xss from 'xss-clean';
 import hpp from 'hpp';
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './swagger.js';
 
 import tourRouter from './routes/tourRoutes.js';
 import userRouter from './routes/userRoutes.js';
@@ -59,6 +61,8 @@ app.use(
     },
   }),
 );
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
