@@ -1,10 +1,14 @@
 import e from 'express';
 import viewController from '../controllers/viewController.js';
+import authController from '../controllers/authController.js';
 
 const viewRouter = e.Router();
 
+viewRouter.use(authController.isLoggedIn);
+
 viewRouter.get('/', viewController.getOverview);
 viewRouter.get('/tour/:slug', viewController.getTour);
+viewRouter.get('/login', viewController.getLoginForm);
 
 export default viewRouter;
 

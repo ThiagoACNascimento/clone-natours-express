@@ -7,6 +7,7 @@ import xss from 'xss-clean';
 import hpp from 'hpp';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './swagger.js';
+import cookieParser from 'cookie-parser';
 
 import tourRouter from './routes/tourRoutes.js';
 import userRouter from './routes/userRoutes.js';
@@ -21,6 +22,7 @@ app.set('view engine', 'pug');
 app.set('views', './views');
 
 app.use(e.static('./public'));
+app.use('/js/axios', e.static('node_modules/axios/dist'));
 // Substitua app.use(helmet()); por isso:
 app.use(
   helmet.contentSecurityPolicy({
@@ -76,6 +78,7 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 
 app.use(e.json({ limit: '10kb' }));
+app.use(cookieParser());
 
 app.use(mongoSanitize());
 
@@ -96,6 +99,7 @@ app.use(
 
 app.use((request, response, next) => {
   request.requestTime = new Date().toISOString();
+  console.log(request.cookies);
   next();
 });
 

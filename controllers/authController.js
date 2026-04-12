@@ -71,23 +71,28 @@ const login = catcher.asyncFuction(async (request, response, next) => {
       password,
       '$2a$12$TQPfgMmHVIosBK0I.6XEo.Ekz.XRUtzJi3VpnAEOXefux84Se.zxC',
     );
-    return next(new AppError('Incorrect email or password', 400));
+    return next(new AppError('Incorrect email or password', 401));
   }
 
   const passwordIsCorrect = await user.correctPassword(password, user.password);
 
   if (!passwordIsCorrect) {
-    return next(new AppError('Incorrect email or password', 400));
+    return next(new AppError('Incorrect email or password', 401));
   }
 
-  createSendToken(user, 201, response, false);
+  createSendToken(user, 200, response, false);
 });
 
 const protect = catcher.asyncFuction(async (request, response, next) => {
   let token;
 
-  if (request.headers.authorization) {
+  if (
+    request.headers.authorization &&
+    request.headers.authorization.startWith('Bearer')
+  ) {
     token = request.headers.authorization.split(' ')[1];
+  } else if (request.cookies.jwt) {
+    token = request.cookies.jwt;
   }
   // console.log(token);
 
@@ -121,6 +126,33 @@ const protect = catcher.asyncFuction(async (request, response, next) => {
   }
 
   request.user = currentUser;
+  next();
+});
+
+const isLoggedIn = catcher.asyncFuction(async (request, response, next) => {
+  if (request.cookies.jwt) {
+    const decoded = await promisify(jwt.verify)(
+      request.cookies.jwt,
+      process.env.JWT_SECRET,
+    );
+
+    const currentUser = await User.findById(decoded.id);
+
+    if (!currentUser) {
+      return next();
+    }
+
+    const isPasswordRecentThanToken = currentUser.changePasswordAfter(
+      decoded.iat,
+    );
+
+    if (isPasswordRecentThanToken) {
+      return next();
+    }
+
+    response.locals.user = currentUser;
+    return next();
+  }
   next();
 });
 
@@ -223,6 +255,7 @@ const authController = {
   signUp,
   login,
   protect,
+  isLoggedIn,
   restrictTo,
   forgotPassword,
   resetPassword,
