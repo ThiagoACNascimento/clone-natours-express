@@ -71,23 +71,28 @@ const login = catcher.asyncFuction(async (request, response, next) => {
       password,
       '$2a$12$TQPfgMmHVIosBK0I.6XEo.Ekz.XRUtzJi3VpnAEOXefux84Se.zxC',
     );
-    return next(new AppError('Incorrect email or password', 400));
+    return next(new AppError('Incorrect email or password', 401));
   }
 
   const passwordIsCorrect = await user.correctPassword(password, user.password);
 
   if (!passwordIsCorrect) {
-    return next(new AppError('Incorrect email or password', 400));
+    return next(new AppError('Incorrect email or password', 401));
   }
 
-  createSendToken(user, 201, response, false);
+  createSendToken(user, 200, response, false);
 });
 
 const protect = catcher.asyncFuction(async (request, response, next) => {
   let token;
 
-  if (request.headers.authorization) {
+  if (
+    request.headers.authorization &&
+    request.headers.authorization.startWith('Bearer')
+  ) {
     token = request.headers.authorization.split(' ')[1];
+  } else if (request.cookies.jwt) {
+    token = request.cookies.jwt;
   }
   // console.log(token);
 
