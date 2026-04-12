@@ -129,6 +129,33 @@ const protect = catcher.asyncFuction(async (request, response, next) => {
   next();
 });
 
+const isLoggedIn = catcher.asyncFuction(async (request, response, next) => {
+  if (request.cookies.jwt) {
+    const decoded = await promisify(jwt.verify)(
+      request.cookies.jwt,
+      process.env.JWT_SECRET,
+    );
+
+    const currentUser = await User.findById(decoded.id);
+
+    if (!currentUser) {
+      return next();
+    }
+
+    const isPasswordRecentThanToken = currentUser.changePasswordAfter(
+      decoded.iat,
+    );
+
+    if (isPasswordRecentThanToken) {
+      return next();
+    }
+
+    response.locals.user = currentUser;
+    return next();
+  }
+  next();
+});
+
 const restrictTo =
   (...roles) =>
   (request, response, next) => {
@@ -228,6 +255,7 @@ const authController = {
   signUp,
   login,
   protect,
+  isLoggedIn,
   restrictTo,
   forgotPassword,
   resetPassword,
