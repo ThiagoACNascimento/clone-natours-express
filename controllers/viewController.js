@@ -10,7 +10,7 @@ const getOverview = catcher.asyncFuction(async (request, response, next) => {
   });
 });
 
-const getTour = catcher.asyncFuction(async (request, response) => {
+const getTour = catcher.asyncFuction(async (request, response, next) => {
   const { slug } = request.params;
   const tour = await Tour.findOne({ slug }).populate({
     path: 'reviews',
@@ -23,9 +23,16 @@ const getTour = catcher.asyncFuction(async (request, response) => {
   });
 });
 
+const getLoginForm = catcher.asyncFuction(async (request, response) => {
+  response.status(200).render('login', {
+    title: 'Log into your account',
+  });
+});
+
 const viewController = {
   getOverview,
   getTour,
+  getLoginForm,
 };
 
 export default viewController;
