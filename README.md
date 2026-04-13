@@ -56,7 +56,7 @@ Natours is a fictional travel company that sells nature tours. This repository c
 ## Getting Started
 
 ```bash
-git clone https://github.com/your-username/natours.git
+git clone https://github.com/ThiagoACNascimento/natours.git
 cd natours
 npm install
 npm run dev
